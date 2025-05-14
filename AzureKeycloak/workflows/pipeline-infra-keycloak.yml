@@ -1,0 +1,67 @@
+name: Deploy Keycloak Infrastructure al Azure AppService Container
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  KC_BOOTSTRAP_ADMIN_PASSWORD: ''
+  KC_BOOTSTRAP_ADMIN_USERNAME: ''
+  RESOURCE_GROUP_NAME: ''
+  client_id: ''
+  tenant_id: ''
+  subscription_id: ''
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update KeycloakAzure.bicepparam with parameter values
+        run: |
+          sed -i "s/param KC_BOOTSTRAP_ADMIN_PASSWORD = .*/param KC_BOOTSTRAP_ADMIN_PASSWORD = '${{ env.KC_BOOTSTRAP_ADMIN_PASSWORD }}'/" ./Identity/Infra/KeycloakAzure.bicepparam
+          sed -i "s/param KC_BOOTSTRAP_ADMIN_USERNAME = .*/param KC_BOOTSTRAP_ADMIN_USERNAME = '${{ env.KC_BOOTSTRAP_ADMIN_USERNAME }}'/" ./Identity/Infra/KeycloakAzure.bicepparam
+          
+      - name: Upload Infra files for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: infra-files
+          path: ./Identity/Infra
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+    permissions:
+      id-token: write #This is required for requesting the JWT
+
+    steps:
+      - name: Download Infra files
+        uses: actions/download-artifact@v4
+        with:
+          name: infra-files
+            
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.client_id }}
+          tenant-id: ${{ env.tenant_id }}
+          subscription-id: ${{ env.subscription_id }}
+      
+      - name: Deploy Bicep File
+        uses: azure/bicep-deploy@v2
+        with:
+          name: DeployBicepFile
+          type: deployment
+          operation: create
+          scope: resourceGroup
+          resource-group-name: ${{ env.RESOURCE_GROUP_NAME }}
+          subscription-id: ${{ env.subscription_id }}
+          template-file: ./KeycloakAzure.bicep
+          parameters-file: ./KeycloakAzure.bicepparam
