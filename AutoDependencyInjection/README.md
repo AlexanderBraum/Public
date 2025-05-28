@@ -41,7 +41,7 @@ If you want to register types as concrete classes:
 ```csharp
 services
     .ScanAssemblyForTypes()
-    .RegisterTypesViaClass(ServiceLifetime.Singleton);
+    .RegisterTypesViaClass(ServiceLifetime.Transient);
 ```
 
 ## Notes
