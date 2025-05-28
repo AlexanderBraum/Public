@@ -1,16 +1,15 @@
-﻿using AutoDependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace AutoDependencyInjection
+namespace DiContainerBuilder
 {
 
-    public static class AutoDependencyInjectionRegisterExtensions
+    public static class DiContainerBuilderExtensions
     {
-        public static AutoDependencyInjectionContainer ScanAssemblyForTypes(
+        public static DiContainerBuilderContainer ScanAssemblyForTypes(
            this IServiceCollection services)
         {
             var assemblies = new[] { Assembly.GetCallingAssembly() };
@@ -18,7 +17,7 @@ namespace AutoDependencyInjection
             return result;
         }
 
-        public static AutoDependencyInjectionContainer ScanAssembliesForTypes(
+        public static DiContainerBuilderContainer ScanAssembliesForTypes(
             this IServiceCollection services,
             Assembly[] assemblies)
         {
@@ -28,20 +27,20 @@ namespace AutoDependencyInjection
                 .Where(x => !x.IsAbstract)
                 .Where(x => !x.IsGenericType)
                 .Where(x => !x.IsNested);
-            return new AutoDependencyInjectionContainer(services, result);
+            return new DiContainerBuilderContainer(services, result);
         }
 
-        public static AutoDependencyInjectionContainer Where(
-            this AutoDependencyInjectionContainer container,
+        public static DiContainerBuilderContainer Where(
+            this DiContainerBuilderContainer container,
             Func<Type, bool> predicate)
         {
             var TypesToRegister = container.TypesToRegister.Where(predicate);
-            var result = new AutoDependencyInjectionContainer(container.Services, TypesToRegister);
+            var result = new DiContainerBuilderContainer(container.Services, TypesToRegister);
             return result;
         }
 
         public static IEnumerable<(Type interfaceType, Type type)> RegisterTypesViaInterface(
-            this AutoDependencyInjectionContainer container,
+            this DiContainerBuilderContainer container,
             ServiceLifetime serviceLifetime)
         {
             var  registredTypes = new List<(Type interfaceType, Type type)>();
@@ -59,7 +58,7 @@ namespace AutoDependencyInjection
         }
 
         public static IEnumerable<Type> RegisterTypesViaClass(
-        this AutoDependencyInjectionContainer container,
+        this DiContainerBuilderContainer container,
         ServiceLifetime serviceLifetime)
         {
             var registredTypes = new List<Type>();

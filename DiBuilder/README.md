@@ -1,5 +1,5 @@
-# AutoDependencyInjection
-AutoDependencyInjection is a simple .NET library that allows you to automatically register classes and their interfaces in the dependency injection container.
+# DiContainerBuilder
+DiContainerBuilder is a simple .NET library that allows you to automatically register classes and their interfaces in the dependency injection container.
 
 This project is inspired by [NetCore.AutoRegisterDi](https://github.com/JonPSmith/NetCore.AutoRegisterDi). I've added a feature to register concrete classes.
 
@@ -16,10 +16,10 @@ Add the project to your solution and reference it from your application.
 
 ## Usage
 
-Below is an example of how to use AutoDependencyInjection in an ASP.NET Core project:
+Below is an example of how to use DiContainerBuilder in an ASP.NET Core project:
 
 ```csharp
-using AutoDependencyInjection;
+using DiContainerBuilder;
 using Microsoft.Extensions.DependencyInjection;
 
 public void ConfigureServices(IServiceCollection services)
